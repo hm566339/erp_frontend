@@ -77,14 +77,30 @@ export default function VendorsPage() {
   ]
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <Toaster />
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Vendors</h1>
-        <button onClick={() => { setEditingId(null); reset(); setIsModalOpen(true) }} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add Vendor</button>
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Vendors</h1>
+          <p className="text-muted-foreground mt-1">Manage your vendor relationships and payments</p>
+        </div>
+        <button 
+          onClick={() => { setEditingId(null); reset(); setIsModalOpen(true) }} 
+          className="w-full sm:w-auto px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Add Vendor
+        </button>
       </div>
 
-      <input type="text" placeholder="Search vendors..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full px-3 py-2 border rounded" />
+      <input 
+        type="text" 
+        placeholder="Search vendors..." 
+        value={searchTerm} 
+        onChange={(e) => setSearchTerm(e.target.value)} 
+        className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" 
+      />
 
       {loading ? (
         <div className="text-center py-12">
@@ -143,17 +159,17 @@ export default function VendorsPage() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96 max-h-96 overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Vendor' : 'New Vendor'}</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background border border-border p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-foreground">{editingId ? 'Edit Vendor' : 'New Vendor'}</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <FormInput label="Vendor Name" {...register('vendorName')} error={errors.vendorName?.message} />
               <FormInput label="Email" type="email" {...register('email')} error={errors.email?.message} />
               <FormInput label="Phone" {...register('phone')} error={errors.phone?.message} />
               <FormInput label="City" {...register('city')} error={errors.city?.message} />
-              <div className="flex gap-2 justify-end">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+              <div className="flex gap-2 justify-end pt-4 border-t border-border">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-input rounded-lg hover:bg-secondary transition-colors">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">Save</button>
               </div>
             </form>
           </div>

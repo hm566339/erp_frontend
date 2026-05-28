@@ -33,7 +33,24 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('[API Error]', error.response?.data || error.message)
+    const status = error.response?.status
+    const message = error.response?.data?.message || error.message
+    
+    console.error('[API Error]', { status, message, data: error.response?.data })
+    
+    // Handle authentication errors
+    if (status === 401) {
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    
+    // Handle authorization errors
+    if (status === 403) {
+      console.warn('[API] Forbidden: User does not have permission')
+    }
+    
     return Promise.reject(error)
   }
 )

@@ -81,16 +81,36 @@ export default function InvoicesPage() {
   ]
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <Toaster />
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Invoices</h1>
-        <button onClick={() => { setEditingId(null); reset(); setIsModalOpen(true) }} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">New Invoice</button>
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Invoices</h1>
+          <p className="text-muted-foreground mt-1">Manage your sales invoices and payments</p>
+        </div>
+        <button 
+          onClick={() => { setEditingId(null); reset(); setIsModalOpen(true) }} 
+          className="w-full sm:w-auto px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+        >
+          New Invoice
+        </button>
       </div>
 
-      <div className="flex gap-4">
-        <input type="text" placeholder="Search customer..." onChange={(e) => setFilters({...filters, customer: e.target.value})} className="px-3 py-2 border rounded" />
-        <select value={filters.status} onChange={(e) => setFilters({...filters, status: e.target.value})} className="px-3 py-2 border rounded">
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <input 
+          type="text" 
+          placeholder="Search customer..." 
+          onChange={(e) => setFilters({...filters, customer: e.target.value})} 
+          className="flex-1 px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" 
+        />
+        <select 
+          value={filters.status} 
+          onChange={(e) => setFilters({...filters, status: e.target.value})} 
+          className="w-full sm:w-auto px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+        >
           <option value="all">All Status</option>
           <option value="draft">Draft</option>
           <option value="sent">Sent</option>
@@ -99,8 +119,8 @@ export default function InvoicesPage() {
         </select>
       </div>
 
-      {loading && <div className="text-center py-12">Loading...</div>}
-      {error && <div className="text-red-600 text-center py-4">{error}</div>}
+      {loading && <div className="text-center py-12 text-muted-foreground">Loading...</div>}
+      {error && <div className="bg-red-100 text-red-800 text-center py-4 rounded-lg border border-red-200">{error}</div>}
       
       {filteredInvoices.length > 0 ? (
         <div className="overflow-x-auto bg-background border border-border rounded-lg">
@@ -153,17 +173,17 @@ export default function InvoicesPage() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96 max-h-96 overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Invoice' : 'New Invoice'}</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background border border-border p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-foreground">{editingId ? 'Edit Invoice' : 'New Invoice'}</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <FormInput label="Invoice Number" {...register('invoiceNumber')} error={errors.invoiceNumber?.message} />
               <FormInput label="Customer" {...register('customerName')} error={errors.customerName?.message} />
               <FormInput label="Amount" type="number" {...register('totalAmount')} error={errors.totalAmount?.message} />
               <FormSelect label="Status" {...register('status')} options={[{label: 'Draft', value: 'draft'}, {label: 'Sent', value: 'sent'}, {label: 'Paid', value: 'paid'}]} error={errors.status?.message} />
-              <div className="flex gap-2 justify-end">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+              <div className="flex gap-2 justify-end pt-4 border-t border-border">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-input rounded-lg hover:bg-secondary transition-colors">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">Save</button>
               </div>
             </form>
           </div>

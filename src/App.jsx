@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { store } from './store/store'
 import AppLayout from './layouts/AppLayout'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import ErrorBoundary from './components/ErrorBoundary'
 import LoginPage from './pages/auth/LoginPage'
 import AuthLayout from './layouts/AuthLayout'
 import DashboardPage from './pages/dashboard/DashboardPage'
@@ -60,11 +61,13 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Provider store={store}>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </Provider>
+    </ErrorBoundary>
   )
 }
 
