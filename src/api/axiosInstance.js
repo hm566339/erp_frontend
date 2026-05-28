@@ -38,14 +38,6 @@ api.interceptors.response.use(
     
     console.error('[API Error]', { status, message, data: error.response?.data })
     
-    // Handle authentication errors
-    if (status === 401) {
-      localStorage.removeItem('authToken')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
-    }
-    
     // Handle authorization errors
     if (status === 403) {
       console.warn('[API] Forbidden: User does not have permission')

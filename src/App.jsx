@@ -4,8 +4,6 @@ import { store } from './store/store'
 import AppLayout from './layouts/AppLayout'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
-import LoginPage from './pages/auth/LoginPage'
-import AuthLayout from './layouts/AuthLayout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import InvoicesPage from './pages/sales/InvoicesPage'
 import InvoiceDetailPage from './pages/sales/InvoiceDetailPage'
@@ -27,13 +25,10 @@ import NotFoundPage from './pages/NotFoundPage'
 function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Routes */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      </Route>
+      {/* Default redirect to dashboard */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* Protected App Routes */}
+      {/* Public App Routes */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/sales/invoices" element={<InvoicesPage />} />
