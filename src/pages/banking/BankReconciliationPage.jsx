@@ -52,44 +52,115 @@ export default function BankReconciliationPage() {
   const totalUncleared = unclearedChecks.reduce((sum, c) => sum + c.amount, 0)
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <Toaster />
+      
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-4">Bank Reconciliation</h1>
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Bank Balance</p>
-            <p className="text-2xl font-bold">{formatCurrency(reconciliation.bankBalance)}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Book Balance</p>
-            <p className="text-2xl font-bold">{formatCurrency(reconciliation.bookBalance)}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Difference</p>
-            <p className={`text-2xl font-bold ${reconciliation.bankBalance === reconciliation.bookBalance ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(reconciliation.bankBalance - reconciliation.bookBalance)}
-            </p>
-          </div>
+        <h1 className="text-3xl font-bold text-foreground">Bank Reconciliation</h1>
+        <p className="text-muted-foreground mt-1">Reconcile bank and book balances</p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Bank Balance</p>
+          <p className="text-3xl font-bold text-foreground mt-2">{formatCurrency(reconciliation.bankBalance)}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Book Balance</p>
+          <p className="text-3xl font-bold text-foreground mt-2">{formatCurrency(reconciliation.bookBalance)}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Difference</p>
+          <p className={`text-3xl font-bold mt-2 ${reconciliation.bankBalance === reconciliation.bookBalance ? 'text-green-600' : 'text-red-600'}`}>
+            {formatCurrency(reconciliation.bankBalance - reconciliation.bookBalance)}
+          </p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded shadow">
-        <h3 className="text-lg font-semibold mb-4">Outstanding Checks ({unclearedChecks.length})</h3>
-        <DataTable columns={checkColumns} data={unclearedChecks} rowsPerPage={10} />
-        <div className="mt-4 text-right text-lg font-semibold">
+      {/* Outstanding Checks */}
+      <div className="bg-background border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Outstanding Checks ({unclearedChecks.length})</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border">
+              <tr>
+                <th className="text-left py-3 px-4 font-medium">Date</th>
+                <th className="text-left py-3 px-4 font-medium">Description</th>
+                <th className="text-right py-3 px-4 font-medium">Amount</th>
+                <th className="text-center py-3 px-4 font-medium">Cleared</th>
+              </tr>
+            </thead>
+            <tbody>
+              {unclearedChecks.map((check) => (
+                <tr key={check.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                  <td className="py-3 px-4">{formatDate(check.date)}</td>
+                  <td className="py-3 px-4">{check.description}</td>
+                  <td className="py-3 px-4 text-right font-medium">{formatCurrency(check.amount)}</td>
+                  <td className="py-3 px-4 text-center">
+                    <input 
+                      type="checkbox" 
+                      checked={check.cleared} 
+                      onChange={() => handleClearItem(check.id)}
+                      className="cursor-pointer"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 text-right text-lg font-semibold text-foreground">
           Total Uncleared: {formatCurrency(totalUncleared)}
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded shadow">
-        <h3 className="text-lg font-semibold mb-4">Deposits</h3>
-        <DataTable columns={depositColumns} data={reconciliation.deposits} rowsPerPage={10} />
+      {/* Deposits */}
+      <div className="bg-background border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Deposits</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border">
+              <tr>
+                <th className="text-left py-3 px-4 font-medium">Date</th>
+                <th className="text-left py-3 px-4 font-medium">Description</th>
+                <th className="text-right py-3 px-4 font-medium">Amount</th>
+                <th className="text-left py-3 px-4 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reconciliation.deposits.map((deposit) => (
+                <tr key={deposit.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                  <td className="py-3 px-4">{formatDate(deposit.date)}</td>
+                  <td className="py-3 px-4">{deposit.description}</td>
+                  <td className="py-3 px-4 text-right font-medium">{formatCurrency(deposit.amount)}</td>
+                  <td className="py-3 px-4">
+                    <span className={`text-sm font-medium ${deposit.cleared ? 'text-green-600' : 'text-orange-600'}`}>
+                      {deposit.cleared ? 'Cleared' : 'Pending'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* Action Buttons */}
       <div className="flex gap-2">
-        <button onClick={() => toast.success('Reconciliation saved')} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Reconciliation</button>
-        <button onClick={() => toast.success('Report generated')} className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Generate Report</button>
+        <button 
+          onClick={() => toast.success('Reconciliation saved')} 
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Save Reconciliation
+        </button>
+        <button 
+          onClick={() => toast.success('Report generated')} 
+          className="px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          Generate Report
+        </button>
       </div>
     </div>
   )

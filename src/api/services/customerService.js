@@ -1,12 +1,11 @@
 import api from '../axiosInstance'
 
 export const customerService = {
-  getCustomers: (params) => api.get('/customers', { params }),
-  getCustomer: (id) => api.get(`/customers/${id}`),
-  createCustomer: (data) => api.post('/customers', data),
-  updateCustomer: (id, data) => api.put(`/customers/${id}`, data),
-  deleteCustomer: (id) => api.delete(`/customers/${id}`),
-  getCustomerDetails: (id) => api.get(`/customers/${id}/details`),
-  getCustomerTransactions: (id, params) => api.get(`/customers/${id}/transactions`, { params }),
-  getCustomerBalance: (id) => api.get(`/customers/${id}/balance`),
+  listCustomers: (params) => api.get('/api/v1/customers', { params }),
+  getCustomer: (id) => api.get(`/api/v1/customers/${id}`),
+  createCustomer: (data) => api.post('/api/v1/customers', data),
+  updateCustomer: (id, data) => api.put(`/api/v1/customers/${id}`, data),
+  deleteCustomer: (id) => api.delete(`/api/v1/customers/${id}`),
+  deactivateCustomer: (id) => api.put(`/api/v1/customers/${id}/deactivate`),
+  activateCustomer: (id) => api.put(`/api/v1/customers/${id}/activate`),
 }

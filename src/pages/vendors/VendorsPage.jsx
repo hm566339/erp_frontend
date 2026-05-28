@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -11,6 +12,7 @@ import { Toaster, toast } from 'sonner'
 
 export default function VendorsPage() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { vendors, loading } = useSelector(state => state.vendor)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -21,7 +23,7 @@ export default function VendorsPage() {
   })
 
   useEffect(() => {
-    dispatch(fetchVendors())
+    dispatch(fetchVendors({}))
   }, [dispatch])
 
   const onSubmit = async (data) => {
@@ -36,9 +38,9 @@ export default function VendorsPage() {
       setIsModalOpen(false)
       setEditingId(null)
       reset()
-      dispatch(fetchVendors())
+      dispatch(fetchVendors({}))
     } catch (err) {
-      toast.error('Failed to save vendor')
+      toast.error(err?.message || 'Failed to save vendor')
     }
   }
 
@@ -53,14 +55,14 @@ export default function VendorsPage() {
       try {
         await dispatch(deleteVendor(id)).unwrap()
         toast.success('Vendor deleted')
-        dispatch(fetchVendors())
-      } catch {
-        toast.error('Failed to delete vendor')
+        dispatch(fetchVendors({}))
+      } catch (err) {
+        toast.error(err?.message || 'Failed to delete vendor')
       }
     }
   }
 
-  const filteredVendors = vendors.filter(v => 
+  const filteredVendors = (vendors || []).filter(v => 
     v.vendorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     v.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -84,7 +86,61 @@ export default function VendorsPage() {
 
       <input type="text" placeholder="Search vendors..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full px-3 py-2 border rounded" />
 
-      {loading ? <div>Loading...</div> : <DataTable columns={columns} data={filteredVendors} onEdit={handleEdit} onDelete={handleDelete} rowsPerPage={10} />}
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        </div>
+      ) : filteredVendors.length > 0 ? (
+        <div className="overflow-x-auto bg-background border border-border rounded-lg">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border">
+              <tr>
+                <th className="text-left py-3 px-4 font-medium">Vendor Name</th>
+                <th className="text-left py-3 px-4 font-medium">Email</th>
+                <th className="text-left py-3 px-4 font-medium">Phone</th>
+                <th className="text-left py-3 px-4 font-medium">City</th>
+                <th className="text-right py-3 px-4 font-medium">Total Spent</th>
+                <th className="text-left py-3 px-4 font-medium">Status</th>
+                <th className="text-right py-3 px-4 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVendors.map((vendor) => (
+                <tr key={vendor.id} className="border-b border-border hover:bg-secondary transition-colors">
+                  <td className="py-3 px-4 cursor-pointer text-accent hover:underline font-medium" onClick={() => navigate(`/vendors/${vendor.id}`)}>
+                    {vendor.vendorName}
+                  </td>
+                  <td className="py-3 px-4 text-sm">{vendor.email}</td>
+                  <td className="py-3 px-4 text-sm">{vendor.phone || 'N/A'}</td>
+                  <td className="py-3 px-4 text-sm">{vendor.city || 'N/A'}</td>
+                  <td className="py-3 px-4 text-right font-medium">{formatCurrency(vendor.totalSpent || 0)}</td>
+                  <td className="py-3 px-4">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${vendor.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {vendor.status === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <button
+                      onClick={() => navigate(`/vendors/${vendor.id}`)}
+                      className="text-accent hover:underline text-xs mr-3"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleDelete(vendor.id)}
+                      className="text-destructive hover:underline text-xs"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="text-center py-12 text-muted-foreground">No vendors found</div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

@@ -32,36 +32,92 @@ export default function GeneralLedgerPage() {
   ]
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <Toaster />
+      
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-4">General Ledger</h1>
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Total Debits</p>
-            <p className="text-2xl font-bold">{formatCurrency(summary.totalDebit)}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Total Credits</p>
-            <p className="text-2xl font-bold">{formatCurrency(summary.totalCredit)}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Balance</p>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(summary.balance)}</p>
-          </div>
+        <h1 className="text-3xl font-bold text-foreground">General Ledger</h1>
+        <p className="text-muted-foreground mt-1">View and manage all account entries</p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Total Debits</p>
+          <p className="text-3xl font-bold text-foreground mt-2">{formatCurrency(summary.totalDebit)}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Total Credits</p>
+          <p className="text-3xl font-bold text-foreground mt-2">{formatCurrency(summary.totalCredit)}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Balance</p>
+          <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(summary.balance)}</p>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow">
-        <h3 className="text-lg font-semibold mb-4">Filters</h3>
+      {/* Filters */}
+      <div className="bg-background border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Filters</h3>
         <div className="grid grid-cols-3 gap-4">
-          <input type="text" placeholder="Account..." value={filters.account} onChange={(e) => setFilters({...filters, account: e.target.value})} className="px-3 py-2 border rounded" />
-          <input type="date" value={filters.startDate} onChange={(e) => setFilters({...filters, startDate: e.target.value})} className="px-3 py-2 border rounded" />
-          <input type="date" value={filters.endDate} onChange={(e) => setFilters({...filters, endDate: e.target.value})} className="px-3 py-2 border rounded" />
+          <input 
+            type="text" 
+            placeholder="Search account..." 
+            value={filters.account} 
+            onChange={(e) => setFilters({...filters, account: e.target.value})} 
+            className="px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <input 
+            type="date" 
+            value={filters.startDate} 
+            onChange={(e) => setFilters({...filters, startDate: e.target.value})} 
+            className="px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <input 
+            type="date" 
+            value={filters.endDate} 
+            onChange={(e) => setFilters({...filters, endDate: e.target.value})} 
+            className="px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          />
         </div>
       </div>
 
-      {loading ? <div>Loading...</div> : <DataTable columns={columns} data={entries} rowsPerPage={15} />}
+      {/* Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <div className="bg-background border border-border rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border bg-secondary/50">
+                <tr>
+                  <th className="text-left py-3 px-4 font-medium">Date</th>
+                  <th className="text-left py-3 px-4 font-medium">Account</th>
+                  <th className="text-left py-3 px-4 font-medium">Description</th>
+                  <th className="text-right py-3 px-4 font-medium">Debit</th>
+                  <th className="text-right py-3 px-4 font-medium">Credit</th>
+                  <th className="text-right py-3 px-4 font-medium">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr key={entry.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                    <td className="py-3 px-4">{formatDate(entry.date)}</td>
+                    <td className="py-3 px-4 font-medium">{entry.account}</td>
+                    <td className="py-3 px-4">{entry.description}</td>
+                    <td className="py-3 px-4 text-right text-accent">{formatCurrency(entry.debit)}</td>
+                    <td className="py-3 px-4 text-right text-accent">{formatCurrency(entry.credit)}</td>
+                    <td className="py-3 px-4 text-right font-medium">{formatCurrency(entry.balance)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

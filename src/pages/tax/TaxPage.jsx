@@ -28,60 +28,114 @@ export default function TaxPage() {
   ]
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <Toaster />
+      
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-4">Tax Management</h1>
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Total Taxable</p>
-            <p className="text-2xl font-bold">{formatCurrency(gstData.reduce((sum, d) => sum + d.taxable, 0))}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Total Tax</p>
-            <p className="text-2xl font-bold">{formatCurrency(gstData.reduce((sum, d) => sum + d.tax, 0))}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Tax Paid</p>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(gstData.reduce((sum, d) => sum + d.paid, 0))}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-gray-600 text-sm">Tax Due</p>
-            <p className="text-2xl font-bold text-orange-600">{formatCurrency(gstData.reduce((sum, d) => sum + d.due, 0))}</p>
-          </div>
+        <h1 className="text-3xl font-bold text-foreground">Tax Management</h1>
+        <p className="text-muted-foreground mt-1">Track and manage tax obligations</p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Total Taxable</p>
+          <p className="text-2xl font-bold text-foreground mt-2">{formatCurrency(gstData.reduce((sum, d) => sum + d.taxable, 0))}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Total Tax</p>
+          <p className="text-2xl font-bold text-foreground mt-2">{formatCurrency(gstData.reduce((sum, d) => sum + d.tax, 0))}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Tax Paid</p>
+          <p className="text-2xl font-bold text-green-600 mt-2">{formatCurrency(gstData.reduce((sum, d) => sum + d.paid, 0))}</p>
+        </div>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <p className="text-muted-foreground text-sm">Tax Due</p>
+          <p className="text-2xl font-bold text-orange-600 mt-2">{formatCurrency(gstData.reduce((sum, d) => sum + d.due, 0))}</p>
         </div>
       </div>
 
-      <div className="flex gap-2 border-b mb-4">
-        <button onClick={() => setTaxPeriod('quarterly')} className={`px-4 py-2 ${taxPeriod === 'quarterly' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'}`}>Quarterly</button>
-        <button onClick={() => setTaxPeriod('annual')} className={`px-4 py-2 ${taxPeriod === 'annual' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'}`}>Annual</button>
+      {/* Tab Buttons */}
+      <div className="flex gap-2 border-b border-border">
+        <button 
+          onClick={() => setTaxPeriod('quarterly')} 
+          className={`px-4 py-2 transition-colors ${taxPeriod === 'quarterly' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Quarterly
+        </button>
+        <button 
+          onClick={() => setTaxPeriod('annual')} 
+          className={`px-4 py-2 transition-colors ${taxPeriod === 'annual' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Annual
+        </button>
       </div>
 
+      {/* GST Chart */}
       {taxPeriod === 'quarterly' && (
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4">GST by Quarter</h3>
+        <div className="bg-background border border-border rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">GST by Quarter</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={gstData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="period" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="period" stroke="hsl(var(--muted-foreground))" />
+              <YAxis stroke="hsl(var(--muted-foreground))" />
               <Tooltip formatter={(value) => formatCurrency(value)} />
               <Legend />
-              <Bar dataKey="tax" fill="#3b82f6" />
-              <Bar dataKey="paid" fill="#10b981" />
+              <Bar dataKey="tax" fill="hsl(var(--primary))" />
+              <Bar dataKey="paid" fill="hsl(var(--accent))" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       )}
 
-      <div className="bg-white p-6 rounded shadow">
-        <h3 className="text-lg font-semibold mb-4">Tax Returns</h3>
-        <DataTable columns={columns} data={taxReturns} rowsPerPage={10} />
+      {/* Tax Returns Table */}
+      <div className="bg-background border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Tax Returns</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border">
+              <tr>
+                <th className="text-left py-3 px-4 font-medium">Tax Period</th>
+                <th className="text-left py-3 px-4 font-medium">Due Date</th>
+                <th className="text-right py-3 px-4 font-medium">Tax Amount</th>
+                <th className="text-left py-3 px-4 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {taxReturns.map((return_item) => (
+                <tr key={return_item.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                  <td className="py-3 px-4">{return_item.period}</td>
+                  <td className="py-3 px-4">{formatDate(return_item.dueDate)}</td>
+                  <td className="py-3 px-4 text-right font-medium">{formatCurrency(return_item.amount)}</td>
+                  <td className="py-3 px-4">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${return_item.status === 'filed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {return_item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* Action Buttons */}
       <div className="flex gap-2">
-        <button onClick={() => toast.success('Tax return generated')} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Generate Tax Return</button>
-        <button onClick={() => toast.success('Report exported')} className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Export Report</button>
+        <button 
+          onClick={() => toast.success('Tax return generated')} 
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Generate Tax Return
+        </button>
+        <button 
+          onClick={() => toast.success('Report exported')} 
+          className="px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          Export Report
+        </button>
       </div>
     </div>
   )
